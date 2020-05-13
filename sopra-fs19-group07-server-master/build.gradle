@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'org.sonarqube'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'jacoco'
+
+bootJar {
+    baseName = 'gs-spring-boot'
+    version =  '0.1.0'
+}
+
+group 'ch.uzh.ifi.seal'
+version '1.0.0'
+
+//noinspection GroovyUnusedAssignment
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+springBoot {
+    mainClassName = 'ch.uzh.ifi.seal.soprafs19.Application'
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile("org.springframework.boot:spring-boot-starter-web")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    runtime('com.h2database:h2')
+}
+
+test {
+    testLogging.showStandardStreams = true
+    maxParallelForks = 1
+}
+
+defaultTasks 'bootJar', 'build'
+
+jacoco {
+    toolVersion = "0.8.2"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+jacocoTestReport {
+    group = "Reporting"
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+sonarqube {
+properties {
+property "sonar.projectName", "sopra-fs19-group07-service"
+property "sonar.projectKey", "sopra-fs19-group07-service"
+}
+}
